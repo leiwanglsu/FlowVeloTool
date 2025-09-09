@@ -42,7 +42,12 @@ def defineFeatureSearchArea(pointCloud, cameraGeometry_interior, cameraGeometry_
     xyd_rgb_map = photo_tool.project_pts_into_img(cameraGeometry_exterior, cameraGeometry_interior, pointCloud, False, False, get3dPointsInImgArea)
     if xyd_rgb_map is None:
         print('point projection into image failed')
-        return
+        return []
+        
+    # Check if xyd_rgb_map is empty or has insufficient dimensions
+    if len(xyd_rgb_map) == 0 or (hasattr(xyd_rgb_map, 'shape') and (xyd_rgb_map.size == 0 or len(xyd_rgb_map.shape) < 2)):
+        print('projected point cloud is empty - cannot create search area')
+        return []
         
     print('point cloud with ' + str(pointCloud.shape[0]) + ' points projected into img')    
     
@@ -71,15 +76,32 @@ def defineFeatureSearchArea(pointCloud, cameraGeometry_interior, cameraGeometry_
         del fig, ax
 
     #find border coordinates of features search mask (is within image frame and greater negative values)
+    # Check if xyd_rgb_map has sufficient dimensions for indexing
+    xyd_rgb_map = np.asarray(xyd_rgb_map)
+    if xyd_rgb_map.size == 0 or len(xyd_rgb_map.shape) < 2:
+        print('projected point cloud has insufficient dimensions for processing')
+        return []
+        
     if get3dPointsInImgArea:
-        xyd_index = np.asarray(xyd_rgb_map[:, 0:6], dtype=np.int)
+        if xyd_rgb_map.shape[1] < 6:
+            print('projected point cloud needs at least 6 columns for 3D point extraction')
+            return []
+        xyd_index = np.asarray(xyd_rgb_map[:, 0:6], dtype=int)
     else:
-        xyd_index = np.asarray(xyd_rgb_map[:,0:2], dtype=np.int)
+        if xyd_rgb_map.shape[1] < 2:
+            print('projected point cloud needs at least 2 columns for 2D processing')
+            return []
+        xyd_index = np.asarray(xyd_rgb_map[:,0:2], dtype=int)
     del xyd_rgb_map
     xyd_index = xyd_index[xyd_index[:,0] < cameraGeometry_interior.resolution_x]
     xyd_index = xyd_index[xyd_index[:,0] > 0]
     xyd_index = xyd_index[xyd_index[:,1] < cameraGeometry_interior.resolution_y]
     xyd_index = xyd_index[xyd_index[:,1] > 0]
+
+    # Check if any points remain after filtering
+    if xyd_index.size == 0:
+        print('no valid points found within image boundaries')
+        return []
 
     if get3dPointsInImgArea:
        return xyd_index[:,3:6]
@@ -142,8 +164,8 @@ def featureDetection(dirImg, img_name, border_pts, minimum_thresh=100, neighbor_
     
     '''---- filter features ---- -> Filter detected features to remove wrong large particles'''
     '''remove features where value below threshold (i.e. too dark features)'''
-    goodFtTr_x_int = np.asarray(goodFtTr_x, dtype=np.int).reshape(goodFtTr_x.shape[0],1)
-    goodFtTr_y_int = np.asarray(goodFtTr_y, dtype=np.int).reshape(goodFtTr_y.shape[0],1)
+    goodFtTr_x_int = np.asarray(goodFtTr_x, dtype=int).reshape(goodFtTr_x.shape[0],1)
+    goodFtTr_y_int = np.asarray(goodFtTr_y, dtype=int).reshape(goodFtTr_y.shape[0],1)
     pt_vals_from_array = img_clipped[goodFtTr_x_int, goodFtTr_y_int]
     
     FtAboveThresh = np.hstack((goodFtTr, pt_vals_from_array))
@@ -152,8 +174,8 @@ def featureDetection(dirImg, img_name, border_pts, minimum_thresh=100, neighbor_
     
     
     '''remove features detected along border of (clipped) image'''
-    goodFtTr_x_int_min = np.asarray(FtAboveThresh[:,0], dtype=np.int).reshape(FtAboveThresh.shape[0],1)
-    goodFtTr_y_int_min = np.asarray(FtAboveThresh[:,1], dtype=np.int).reshape(FtAboveThresh.shape[0],1)
+    goodFtTr_x_int_min = np.asarray(FtAboveThresh[:,0], dtype=int).reshape(FtAboveThresh.shape[0],1)
+    goodFtTr_y_int_min = np.asarray(FtAboveThresh[:,1], dtype=int).reshape(FtAboveThresh.shape[0],1)
     
     minimum_filtered_img = ndimage.minimum_filter(img_clipped, size=10)
     pt_vals_from_array_min = minimum_filtered_img[goodFtTr_x_int_min, goodFtTr_y_int_min]
@@ -196,8 +218,8 @@ def featureDetection(dirImg, img_name, border_pts, minimum_thresh=100, neighbor_
 
 
 def NN_pts_FD(reference_pts, target_pts, max_NN_dist=1, plot_results=False):     
-    reference_pts_xy_int = np.asarray(reference_pts[:,0:2], dtype = np.int)
-    target_pts_int = np.asarray(target_pts[:,0:2], dtype = np.int)
+    reference_pts_xy_int = np.asarray(reference_pts[:,0:2], dtype = int)
+    target_pts_int = np.asarray(target_pts[:,0:2], dtype = int)
     
     points_list = list(target_pts_int)
 
@@ -232,8 +254,8 @@ def NN_pts_FD(reference_pts, target_pts, max_NN_dist=1, plot_results=False):
 
 
 def NN_pts(reference_pts, target_pts, max_NN_dist=1, plot_results=False):     
-    reference_pts_xy_int = np.asarray(reference_pts[:,0:2], dtype = np.int)
-    target_pts_int = np.asarray(target_pts, dtype = np.int)
+    reference_pts_xy_int = np.asarray(reference_pts[:,0:2], dtype = int)
+    target_pts_int = np.asarray(target_pts, dtype = int)
     
     points_list = list(target_pts_int)
 
@@ -330,6 +352,11 @@ def raster_clip(ras_to_clip, geotrans, polygon, visualize=False, flipped_rows=Fa
         poly_coo = np.asarray(polygon, dtype=np.uint)
     
     #determine min and max for image extent setting
+    #check if the image is empty
+    if poly_coo.size == 0:
+        print('Warning: Polygon coordinates are empty.')
+        return
+    print(poly_coo.shape)
     x_min = np.nanmin(poly_coo[:,0])
     if x_min < 0:
         x_min = 0
@@ -418,8 +445,8 @@ def LSPIV_features(dirImg, img_name, border_pts, pointDist_x, pointDist_y, saveP
     img_clipped_y = raster_clip(img_id_y, 0, border_pts, False, False, False)
     
     '''define features'''
-    features_col = img_clipped_x[np.int(pointDist_x/2)::np.int(pointDist_x/2),np.int(pointDist_y/2)::np.int(pointDist_y/2)]
-    features_row = img_clipped_y[np.int(pointDist_x/2)::np.int(pointDist_x/2),np.int(pointDist_y/2)::np.int(pointDist_y/2)]
+    features_col = img_clipped_x[int(pointDist_x/2)::int(pointDist_x/2),int(pointDist_y/2)::int(pointDist_y/2)]
+    features_row = img_clipped_y[int(pointDist_x/2)::int(pointDist_x/2),int(pointDist_y/2)::int(pointDist_y/2)]
     
     features = np.hstack((features_row.reshape(features_row.shape[0]*features_row.shape[1],1), 
                           features_col.reshape(features_col.shape[0]*features_col.shape[1],1)))

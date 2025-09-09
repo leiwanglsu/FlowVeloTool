@@ -308,21 +308,21 @@ def read_aicon_ior(directory, ior_file=None):
 
     ior_mat = camera_interior()
     
-    ior_mat.ck = np.float(ior_table[2])
-    ior_mat.xh = np.float(ior_table[3])
-    ior_mat.yh = np.float(ior_table[4])
-    ior_mat.A1 = np.float(ior_table[5])
-    ior_mat.A2 = np.float(ior_table[6])
-    ior_mat.A3 = np.float(ior_table[8])
-    ior_mat.r0 = np.float(ior_table[7])
-    ior_mat.B1 = np.float(ior_table[9])
-    ior_mat.B2 = np.float(ior_table[10])
-    ior_mat.C1 = np.float(ior_table[11])
-    ior_mat.C2 = np.float(ior_table[12])
-    ior_mat.sensor_size_x = np.float(ior_table[13])
-    ior_mat.sensor_size_y = np.float(ior_table[14])
-    ior_mat.resolution_x = np.int(ior_table[15])
-    ior_mat.resolution_y = np.int(ior_table[16])
+    ior_mat.ck = float(ior_table[2])
+    ior_mat.xh = float(ior_table[3])
+    ior_mat.yh = float(ior_table[4])
+    ior_mat.A1 = float(ior_table[5])
+    ior_mat.A2 = float(ior_table[6])
+    ior_mat.A3 = float(ior_table[8])
+    ior_mat.r0 = float(ior_table[7])
+    ior_mat.B1 = float(ior_table[9])
+    ior_mat.B2 = float(ior_table[10])
+    ior_mat.C1 = float(ior_table[11])
+    ior_mat.C2 = float(ior_table[12])
+    ior_mat.sensor_size_x = float(ior_table[13])
+    ior_mat.sensor_size_y = float(ior_table[14])
+    ior_mat.resolution_x = int(ior_table[15])
+    ior_mat.resolution_y = int(ior_table[16])
 
     return ior_mat
 
@@ -410,7 +410,7 @@ def undistort_img_coos(img_pts, interior_orient, mm_val=False):
                     x_dash = camCoo_x
                     y_dash = camCoo_y
                     if x_dash.shape[0] < 2:
-                        r2 = np.float(x_dash**2 + y_dash**2)  #img radius
+                        r2 = float(x_dash**2 + y_dash**2)  #img radius
                     else:
                         r2 = x_dash**2 + y_dash**2
                     r = np.sqrt(r2)
@@ -816,7 +816,7 @@ def getPoseWithOpenCV(img_pts, gcp_pts, cam_file, plot_results=False, image=None
     _, rvec_solved, tvec_solved = cv2.solvePnP(gcp_coos, img_pts, camMatrix, distCoeff, cv2.SOLVEPNP_EPNP)  #, useExtrinsicGuess=False)
 
     '''convert to angles and XYZ'''
-    np_rodrigues = np.asarray(rvec_solved[:,:],np.float64)
+    np_rodrigues = np.asarray(rvec_solved[:,:],dtype=np.float64)
     rot_matrix = cv2.Rodrigues(np_rodrigues)[0]
     
     position = -np.matrix(rot_matrix).T * np.matrix(tvec_solved)
@@ -833,8 +833,8 @@ def getPoseWithOpenCV(img_pts, gcp_pts, cam_file, plot_results=False, image=None
 def NN_pts(reference_pts, target_pts, max_NN_dist=1, plot_results=False,
            closest_to_cam=False, ior_mat=None, eor_mat=None):   #ior_mat, eor_mat,     
     #get nearest neighbors
-    reference_pts_xy_int = np.asarray(reference_pts[:,0:2], dtype = np.int)
-    target_pts_int = np.asarray(target_pts, dtype = np.int)    
+    reference_pts_xy_int = np.asarray(reference_pts[:,0:2], dtype = int)
+    target_pts_int = np.asarray(target_pts, dtype = int)    
     points_list = list(target_pts_int)
 
     #define kd-tree

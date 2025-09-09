@@ -299,8 +299,8 @@ def draw_tracks_raster(Final_Vals, image, dir_out, outputImgName, variableToDraw
 
     array_pts = np.zeros((image.shape[0] / cell_size, image.shape[1] / cell_size))
     array_pts[:] = np.nan
-    row_ind = np.asarray(image_points.y.values, dtype=np.int) - 1
-    col_ind = np.asarray(image_points.x.values, dtype=np.int) - 1
+    row_ind = np.asarray(image_points.y.values, dtype=int) - 1
+    col_ind = np.asarray(image_points.x.values, dtype=int) - 1
     rowcol_ind = np.vstack((row_ind,col_ind))
     rowcol_ind = rowcol_ind[rowcol_ind[:,0]>=0]
     rowcol_ind = rowcol_ind[rowcol_ind[:,1]>=0]
@@ -349,8 +349,8 @@ def Pixel2xy(array, cell_size):
     col_merged = list(itertools.chain(*col))                 
     row = np.array(row_merged)
     col = np.array(col_merged)
-    y = np.asarray(row * cell_size, dtype=np.int) 
-    x = np.asarray(col * cell_size, dtype=np.int)
+    y = np.asarray(row * cell_size, dtype=int) 
+    x = np.asarray(col * cell_size, dtype=int)
  
     return [x, y]
 
@@ -358,8 +358,8 @@ def Pixel2xy(array, cell_size):
 def NN_pts(ref_pts, target_pts, max_NN_dist):
 #input ref_pts, target_pts ... array
     
-    reference_pts_xy_int = np.asarray(ref_pts[:,0:2], dtype = np.int)
-    target_pts_int = np.asarray(target_pts[:,0:2], dtype = np.int)
+    reference_pts_xy_int = np.asarray(ref_pts[:,0:2], dtype = int)
+    target_pts_int = np.asarray(target_pts[:,0:2], dtype = int)
     
     points_list = list(target_pts_int)
 
@@ -384,7 +384,7 @@ def NN_pts(ref_pts, target_pts, max_NN_dist):
         ref_pts_arr = np.hstack((ref_pts_arr, i_arr))
         j = 0
         while j < ref_pts_arr.shape[0]:
-            NN_to_crosssec.append(ref_pts_arr[np.int(j),:])
+            NN_to_crosssec.append(ref_pts_arr[int(j),:])
             j = j + 1
         
     return np.asarray(NN_to_crosssec)
@@ -393,8 +393,8 @@ def NN_pts(ref_pts, target_pts, max_NN_dist):
 def NN_difference(ref_pts, target_pts, max_NN_dist, singlePoint=True):
 #input ref_pts, target_pts ... array
     
-    reference_pts_xy = np.asarray(ref_pts[:,0:2], dtype = np.float)
-    target_pts_xy = np.asarray(target_pts[:,0:2], dtype = np.float)
+    reference_pts_xy = np.asarray(ref_pts[:,0:2], dtype = float)
+    target_pts_xy = np.asarray(target_pts[:,0:2], dtype = float)
     
     points_list = list(target_pts_xy)
 
@@ -427,10 +427,10 @@ def NN_difference(ref_pts, target_pts, max_NN_dist, singlePoint=True):
         if not NNpts:  #if no nearby point found, skip
             continue        
         
-        velo_ref = ref_pts[np.int(NNpts),2]
+        velo_ref = ref_pts[int(NNpts),2]
         
         if singlePoint:
-            NN_diff.append([ref_pts[np.int(NNpts),0],ref_pts[np.int(NNpts),1],
+            NN_diff.append([ref_pts[int(NNpts),0],ref_pts[int(NNpts),1],
                             velo_ref,distFilteredShortestToTarget[i,2]])
         else:
             velo_target = np.ones((velo_ref.shape[0])) * target_pts[i,2]       

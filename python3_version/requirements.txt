@@ -1,0 +1,11 @@
+scipy 
+scikit-learn 
+scikit-image
+shapely 
+imageio 
+opencv-python 
+seaborn 
+matplotlib 
+pyttk 
+pandas 
+numpy 

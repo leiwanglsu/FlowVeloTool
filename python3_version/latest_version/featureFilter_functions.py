@@ -250,8 +250,8 @@ def DefineRFeatures_forRasterbasedFilter(img, border_pts, cell_size):
     img_clipped_y = detectF.raster_clip(img_id_y, 0, border_pts, False, False, False)
     
     '''define features'''
-    features_col = img_clipped_x[np.int(cell_size/2)::np.int(cell_size/2),np.int(cell_size/2)::np.int(cell_size/2)]
-    features_row = img_clipped_y[np.int(cell_size/2)::np.int(cell_size/2),np.int(cell_size/2)::np.int(cell_size/2)]
+    features_col = img_clipped_x[int(cell_size/2)::int(cell_size/2),int(cell_size/2)::int(cell_size/2)]
+    features_row = img_clipped_y[int(cell_size/2)::int(cell_size/2),int(cell_size/2)::int(cell_size/2)]
     
     features = np.hstack((features_col.reshape(features_col.shape[0]*features_col.shape[1],1),
                           features_row.reshape(features_row.shape[0]*features_row.shape[1],1)))
@@ -267,11 +267,11 @@ def DefineRFeatures_forRasterbasedFilter(img, border_pts, cell_size):
 def NN_filter(velo_points, targeting_pts, max_NN_dist, points3D=False):
     
     if points3D: 
-        target_pts = np.asarray(targeting_pts[['X','Y','Z']], dtype = np.float)
-        search_points = np.asarray(velo_points[['X','Y','Z']], dtype = np.float)
+        target_pts = np.asarray(targeting_pts[['X','Y','Z']], dtype = float)
+        search_points = np.asarray(velo_points[['X','Y','Z']], dtype = float)
     else:
-        target_pts = np.asarray(targeting_pts[['x','y']], dtype = np.float)
-        search_points = np.asarray(velo_points[['x','y']], dtype = np.float)       
+        target_pts = np.asarray(targeting_pts[['x','y']], dtype = float)
+        search_points = np.asarray(velo_points[['x','y']], dtype = float)       
 
     #define kd-tree
     velotree = scipy.spatial.cKDTree(search_points)
@@ -288,7 +288,7 @@ def NN_filter(velo_points, targeting_pts, max_NN_dist, points3D=False):
         if not NNpts:  #if no nearby point found, skip
             continue
         try:
-            NNpts = np.asarray(NNpts, dtype=np.int)
+            NNpts = np.asarray(NNpts, dtype=int)
             velosPerTarget = velo_points.iloc[NNpts,:]
 
             velo_std = velosPerTarget.velo.std()

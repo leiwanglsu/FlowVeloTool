@@ -281,7 +281,7 @@ def clickImgCoo(image, gcpList, directoryOutput):
 #         dist_metric = np.sqrt(np.square(XY_start_tr[:, 0] - XY_tr[:, 0]) + (np.square(XY_start_tr[:, 1] - XY_tr[:, 1])))
 #
 #         # get corresponding temporal observation span
-#         frame_rate = np.ones((filteredFeatures_count.shape[0], 1), dtype=np.float) * np.float(frame_rate_cam)
+#         frame_rate = np.ones((filteredFeatures_count.shape[0], 1), dtype=float) * float(frame_rate_cam)
 #         nbrTrackedFrames = TrackEveryNthFrame * (filteredFeatures_count-1)
 #         trackingDuration = nbrTrackedFrames.reshape(frame_rate.shape[0], 1) / frame_rate
 #         print(trackingDuration)

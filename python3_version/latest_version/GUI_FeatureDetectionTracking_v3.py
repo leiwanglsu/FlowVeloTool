@@ -1311,7 +1311,7 @@ class FlowVeloTool:
         minDistance_px = self.minDistance_px.get()   #in pixel
         maxDistance_px = self.maxDistance_px.get()
         minTrackedFeatures = self.minTrackedFeatures.get()
-        minTrackedFeatures = np.int(FT_forNthNberFrames*(minTrackedFeatures/100)/TrackEveryNthFrame)
+        minTrackedFeatures = int(FT_forNthNberFrames*(minTrackedFeatures/100)/TrackEveryNthFrame)
 
 
         '''-------read data and prepare for following processing-------'''        
@@ -1359,7 +1359,8 @@ class FlowVeloTool:
         try:
             interior_orient = photogrF.read_aicon_ior(ior_file) #read interior orientation from file (aicon)   
         except:
-            print('failed reading interior orientation file')        
+            print('failed reading interior orientation file') 
+            raise(Exception('failed reading interior orientation file'))       
 
         try:
             img_list = ioF.read_imgs_folder(dir_imgs) #read image names in folder

@@ -334,7 +334,7 @@ def AKAZEDescriptors(image, thresholdDetector=None, img_import=False):
     image_gray = np.uint8(image_gray)
 
     if not thresholdDetector == None:
-        akaze = cv2.AKAZE_create(threshold=np.float(thresholdDetector))
+        akaze = cv2.AKAZE_create(threshold=float(thresholdDetector))
     else:
         akaze = cv2.AKAZE_create()
     keypoints, descriptors = akaze.detectAndCompute(image_gray, None)
@@ -376,11 +376,11 @@ def match_DescriptorsBF_NN(kpts1, kpts2, desc1, desc2, twosided=True):
         pts1_ts = []
         pts2_ts = []
         for pts in pts_12:
-            pts_comp_1 = np.asarray(pts[0].pt, dtype=np.int)
-            pts_comp_2 = np.asarray(pts[1].pt, dtype=np.int)
+            pts_comp_1 = np.asarray(pts[0].pt, dtype=int)
+            pts_comp_2 = np.asarray(pts[1].pt, dtype=int)
             for pts_b in pts_21:
-                pts_comp_b_1 = np.asarray(pts_b[0].pt, dtype=np.int)
-                pts_comp_b_2 = np.asarray(pts_b[1].pt, dtype=np.int)
+                pts_comp_b_1 = np.asarray(pts_b[0].pt, dtype=int)
+                pts_comp_b_2 = np.asarray(pts_b[1].pt, dtype=int)
                 if ((pts_comp_1[0] == pts_comp_b_2[0]) and (pts_comp_1[1] == pts_comp_b_2[1])
                     and (pts_comp_2[0] == pts_comp_b_1[0]) and (pts_comp_2[1] == pts_comp_b_1[1])):
                     pts1_ts.append(pts[0].pt)
@@ -442,9 +442,9 @@ def match_DescriptorsBF(des1,des2,kp1,kp2,ratio_test=True,twosided=True):
         pts1_ts = []
         pts2_ts = []        
         for pts in pts_12:
-            pts_comp = np.asarray(pts, dtype = np.int)
+            pts_comp = np.asarray(pts, dtype = int)
             for pts_b in pts_21:
-                pts_b_comp = np.asarray(pts_b, dtype = np.int)
+                pts_b_comp = np.asarray(pts_b, dtype = int)
                 if ((int(pts_comp[0]) == int(pts_b_comp[2])) and (int(pts_comp[1]) == int(pts_b_comp[3]))
                     and (int(pts_comp[2]) == int(pts_b_comp[0])) and (int(pts_comp[3]) == int(pts_b_comp[1]))):
                     pts1_ts.append(pts[0:2].tolist())
@@ -542,9 +542,9 @@ def match_twosidedSift(desc1, desc2, kp1, kp2, match_Variant="FLANN"):
     pts1_ts = []
     pts2_ts = []
     for pts in pts_12:
-        pts_comp = np.asarray(pts, dtype=np.int)
+        pts_comp = np.asarray(pts, dtype=int)
         for pts_b in pts_21:
-            pts_b_comp = np.asarray(pts_b, dtype=np.int)
+            pts_b_comp = np.asarray(pts_b, dtype=int)
             if ((int(pts_comp[0]) == int(pts_b_comp[2])) and (int(pts_comp[1]) == int(pts_b_comp[3]))
                     and (int(pts_comp[2]) == int(pts_b_comp[0])) and (int(pts_comp[3]) == int(pts_b_comp[1]))):
                 pts1_ts.append(pts[0:2].tolist())
@@ -649,18 +649,18 @@ def getTemplateAtImgpoint(img, img_pts, template_width=10, template_height=10):
         
         #consideration of reaching of image boarders (cutting of templates)
         if pt[1] + template_height_for_cut_upper > img.shape[0]:
-            template_height_for_cut_upper = np.int(img.shape[0] - pt[1])
+            template_height_for_cut_upper = int(img.shape[0] - pt[1])
         if pt[1] - template_height_for_cut_lower < 0:
-            template_height_for_cut_lower = np.int(pt[1])
+            template_height_for_cut_lower = int(pt[1])
             cut_anchor_y = 0
         if pt[0] + template_width_for_cut_right > img.shape[1]:
-            template_width_for_cut_right = np.int(img.shape[1] - pt[0])
+            template_width_for_cut_right = int(img.shape[1] - pt[0])
         if pt[0] - template_width_for_cut_left < 0:
-            template_width_for_cut_left = np.int(pt[0])
+            template_width_for_cut_left = int(pt[0])
             cut_anchor_x = 0
         
-        template = img[np.int(pt[1]-template_height_for_cut_lower) : np.int(pt[1]+template_height_for_cut_upper), 
-                       np.int(pt[0]-template_width_for_cut_left) : np.int(pt[0]+template_width_for_cut_right)]
+        template = img[int(pt[1]-template_height_for_cut_lower) : int(pt[1]+template_height_for_cut_upper), 
+                       int(pt[0]-template_width_for_cut_left) : int(pt[0]+template_width_for_cut_right)]
         
         #template_img = np.dstack((template_img, template))
         template_img.append(template)

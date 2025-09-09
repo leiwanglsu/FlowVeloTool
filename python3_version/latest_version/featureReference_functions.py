@@ -158,7 +158,7 @@ def TracksToVelocityWithTransformMat(start_point, end_point, transform_mat, fram
     x_t = xy_transformed.flatten()[0]
     y_t = xy_transformed.flatten()[1]
     dist = np.sqrt(np.square(x_start_t-x_t) + (np.square(y_start_t-y_t)))
-    velo = dist/(1/np.float(frame_rate))
+    velo = dist/(1/float(frame_rate))
     
     return([start_point[0], start_point[1], x_start_t, y_start_t,
             end_point[0], end_point[1], x_t, y_t, dist, velo])
@@ -171,7 +171,7 @@ def TracksToVelocity_PerPoint(start_point, end_point, frame_rate):
     y_t = end_point[1]
 
     dist = np.sqrt(np.square(x_start_t-x_t) + (np.square(y_start_t-y_t)))
-    velo = dist/(1/np.float(frame_rate))
+    velo = dist/(1/float(frame_rate))
     
     return([start_point[0], start_point[1], x_start_t, y_start_t,
             end_point[0], end_point[1], x_t, y_t, dist, velo])

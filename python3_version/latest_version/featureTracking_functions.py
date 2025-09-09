@@ -61,11 +61,11 @@ def lsm_matching(patch, lsm_search, pointAdjusted, lsm_buffer, thresh=0.001):
     dif_patch_lsm_size_y = (lsm_search.shape[0] - patch.shape[0]) / 2
     
     p_shift_ini = pointImg()
-    p_shift_ini.x = np.int(lsm_search.shape[1]/2) 
-    p_shift_ini.y =  np.int(lsm_search.shape[0]/2) 
+    p_shift_ini.x = int(lsm_search.shape[1]/2) 
+    p_shift_ini.y =  int(lsm_search.shape[0]/2) 
     
     #approximation
-    U = np.asarray([np.int(lsm_search.shape[1]/2), np.int(lsm_search.shape[0]/2)], dtype=np.float)
+    U = np.asarray([int(lsm_search.shape[1]/2), int(lsm_search.shape[0]/2)], dtype=float)
     A = np.zeros((n, U.shape[0]))
     l = np.zeros((n, 1))
     
@@ -201,10 +201,10 @@ def interopolateGreyvalue(img, x, y, rot_angle=0): #bilinear interpolation
 
 def contrastAdaption(I1, I2):
 #I2 is larger image    
-    minI1 = np.float(np.nanmin(I1))
-    maxI1 = np.float(np.nanmax(I1))
-    minI2 = np.float(np.nanmin(I2))
-    maxI2 = np.float(np.nanmax(I2))
+    minI1 = float(np.nanmin(I1))
+    maxI1 = float(np.nanmax(I1))
+    minI2 = float(np.nanmin(I2))
+    maxI2 = float(np.nanmax(I2))
        
     #adapt contrast
     I2_adapt = ((maxI1-minI1)/(maxI2-minI2)) * (I2 - np.ones((I2.shape[0], I2.shape[1])) * minI2) + np.ones((I2.shape[0], I2.shape[1])) * minI1
@@ -212,7 +212,7 @@ def contrastAdaption(I1, I2):
     I2_adapt[I2_adapt < 0] = 0
     I2_adapt[I2_adapt > 255] = 255
     
-    I2_adapt = np.asarray(I2_adapt, dtype=np.int)
+    I2_adapt = np.asarray(I2_adapt, dtype=int)
     
     return I2_adapt
 
@@ -227,7 +227,7 @@ def brightnessAdaption(I1, I2):
     I2_adapt[I2_adapt < 0] = 0
     I2_adapt[I2_adapt > 255] = 255
     
-    I2_adapt = np.asarray(I2_adapt, dtype=np.int)
+    I2_adapt = np.asarray(I2_adapt, dtype=int)
     
     return I2_adapt
 
@@ -277,30 +277,30 @@ def getTemplate(img, tmplPtCoo, template_width=10, template_height=10, forTracki
         if forTracking:
             print ('template reaches upper border')
             return 1/0        
-        template_height_for_cut_upper = np.int(img.shape[0] - tmplPtCoo[1])        
+        template_height_for_cut_upper = int(img.shape[0] - tmplPtCoo[1])        
     if tmplPtCoo[1] - template_height_for_cut_lower < 0:
         if forTracking:
             print ('template reaches lower border')
             return 1/0            
-        template_height_for_cut_lower = np.int(tmplPtCoo[1])
+        template_height_for_cut_lower = int(tmplPtCoo[1])
         cut_anchor_y = 0
         
     if tmplPtCoo[0] + template_width_for_cut_right > img.shape[1]:
         if forTracking:
             print ('template reaches right border')
             return 1/0    
-        template_width_for_cut_right = np.int(img.shape[1] - tmplPtCoo[0])        
+        template_width_for_cut_right = int(img.shape[1] - tmplPtCoo[0])        
     if tmplPtCoo[0] - template_width_for_cut_left < 0:
         if forTracking:
             print ('template reaches right border')
             return 1/0    
-        template_width_for_cut_left = np.int(tmplPtCoo[0])
+        template_width_for_cut_left = int(tmplPtCoo[0])
         cut_anchor_x = 0
         
     try:
         #cut template from source image
-        template = img[np.int(tmplPtCoo[1])-np.int(template_height_for_cut_lower) : np.int(tmplPtCoo[1])+np.int(template_height_for_cut_upper), 
-                       np.int(tmplPtCoo[0])-np.int(template_width_for_cut_left) : np.int(tmplPtCoo[0])+np.int(template_width_for_cut_right)]
+        template = img[int(tmplPtCoo[1])-int(template_height_for_cut_lower) : int(tmplPtCoo[1])+int(template_height_for_cut_upper), 
+                       int(tmplPtCoo[0])-int(template_width_for_cut_left) : int(tmplPtCoo[0])+int(template_width_for_cut_right)]
     except Exception as e:
         _, _, exc_tb = sys.exc_info()
         print(e, 'line ' + str(exc_tb.tb_lineno))    

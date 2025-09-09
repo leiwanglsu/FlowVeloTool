@@ -92,15 +92,32 @@ def searchMask(waterlevel_pt, waterlevel_buffer, AoI_file, ptCloud, unit_gcp, in
             searchMask = detectF.readMaskImg(AoI_file, directoryOutput, imgContourDraw)
         except:
             print('reading search mask file failed')
-        
+            print('estimating from water level information and 3D point cloud')
+            ptCloud_array = np.asarray(ptCloud)
+            print(ptCloud_array.shape)
+            if ptCloud_array.size == 0 or len(ptCloud_array.shape) < 2:
+                print('Warning: Point cloud is empty or invalid. Cannot create search mask from point cloud.')
+                searchMask = []
+            else:
+                pointsBelowWater = ptCloud_array[ptCloud_array[:,2] < waterlevel] * unit_gcp
+                searchMask = detectF.defineFeatureSearchArea(pointsBelowWater, interior_orient, eor_mat, False, savePlotData, directoryOutput, img_list[1])  #xy        
+
     #...or calculate from water level information and 3D point cloud
     else:
         #select points only below water level to extract river area to search for features...
-        pointsBelowWater = ptCloud[ptCloud[:,2] < waterlevel] * unit_gcp
-        searchMask = detectF.defineFeatureSearchArea(pointsBelowWater, interior_orient, eor_mat, False, savePlotData, directoryOutput, img_list[1])  #xy        
+        ptCloud_array = np.asarray(ptCloud)
+        if ptCloud_array.size == 0 or len(ptCloud_array.shape) < 2:
+            print('Warning: Point cloud is empty or invalid. Cannot create search mask from point cloud.')
+            searchMask = []
+        else:
+            pointsBelowWater = ptCloud_array[ptCloud_array[:,2] < waterlevel] * unit_gcp
+            searchMask = detectF.defineFeatureSearchArea(pointsBelowWater, interior_orient, eor_mat, False, savePlotData, directoryOutput, img_list[1])  #xy
             
     searchMask = np.asarray(searchMask)
-    print('search mask with ' + str(searchMask.shape[0]) + ' points defined\n')
+    if searchMask.size > 0:
+        print('search mask with ' + str(searchMask.shape[0]) + ' points defined\n')
+    else:
+        print('search mask is empty\n')
     
     return searchMask
 
@@ -313,7 +330,7 @@ def FilterTracks(trackedFeaturesOutput_undist, img_name, directoryOutput,
     '''filter tracks considering several filter parameters'''
     #transform dataframe to numpy array and get feature ids
     trackedFeaturesOutput_undist = np.asarray(trackedFeaturesOutput_undist)
-    trackedFeaturesOutput_undist = np.asarray(trackedFeaturesOutput_undist[:,1:4], dtype=np.float)
+    trackedFeaturesOutput_undist = np.asarray(trackedFeaturesOutput_undist[:,1:4], dtype=float)
     featureIDs_fromTracking = np.unique(trackedFeaturesOutput_undist[:,0])
     Features_px = np.empty((1,6))
     
@@ -452,9 +469,9 @@ def TracksPx_to_TracksMetric(filteredFeatures, interior_orient, eor_mat, unit_gc
 
     #get corresponding temporal observation span
     if lspiv:
-        trackingDuration = np.ones((id_features.shape[0],1), dtype=np.float) * TrackEveryNthFrame / np.float(frame_rate_cam)
+        trackingDuration = np.ones((id_features.shape[0],1), dtype=float) * TrackEveryNthFrame / float(frame_rate_cam)
     else:
-        frame_rate_cam = np.ones((filteredFeatures_count.shape[0],1), dtype=np.float) * np.float(frame_rate_cam)
+        frame_rate_cam = np.ones((filteredFeatures_count.shape[0],1), dtype=float) * float(frame_rate_cam)
         nbrTrackedFrames = TrackEveryNthFrame * (filteredFeatures_count+1)
         trackingDuration = nbrTrackedFrames.reshape(frame_rate_cam.shape[0],1) / frame_rate_cam
 
